@@ -9,6 +9,8 @@ import { HiVolumeUp, HiVolumeOff } from "react-icons/hi";
 import axios from "axios";
 import { Video } from "../../types";
 import useAuthStore from "../../store/authStore";
+import Comments from "../../components/Comments";
+import LikeButton from "../../components/LikeButton";
 
 interface IProps {
   postDetails: Video;
@@ -31,6 +33,16 @@ const Detail = ({ postDetails }: IProps) => {
     } else {
       videoRef?.current?.play();
       setPlaying(true);
+    }
+  };
+
+  const handleLike = async (like: boolean) => {
+    if (userProfile) {
+      const response = await axios.put(`${process.env.BASE_URL}/api/like`, {
+        userId: userProfile._id,
+        postId: post._id,
+        like,
+      });
     }
   };
 
@@ -87,7 +99,7 @@ const Detail = ({ postDetails }: IProps) => {
       <div className="relative w-[1000px] md:w-[900px] lg:[700px]">
         <div className="lg:mt-20 mt-10">
           <div className="flex gap-3 p-2 cursor-pointer font-semibold  rounded">
-            <div className="md:w-16 md:h-16 w-10 h-10">
+            <div className="ml-4 md:w-20 md:h-20 w-16 h-16">
               <Link href="/">
                 <>
                   <Image
@@ -103,7 +115,7 @@ const Detail = ({ postDetails }: IProps) => {
             </div>
             <div>
               <Link href="/">
-                <div className="flex items-center gap-2">
+                <div className="mt-3 flex flex-col gap-2">
                   <p className="flex gap-2 items-center md:text-md font-bold text-primary">
                     {post.postedBy.userName} {` `}
                     <GoVerified className="text-blue-400 text-md" />
@@ -115,6 +127,18 @@ const Detail = ({ postDetails }: IProps) => {
               </Link>
             </div>
           </div>
+          <p className="px-10 text-md text-gray-600 text-lg">{post.caption}</p>
+          <div className="mt-10 px-10">
+            {userProfile && (
+              <LikeButton
+                handleLike={() => handleLike(true)}
+                handleDislike={() => handleLike(false)}
+                likes={post.likes}
+                flex="flex"
+              />
+            )}
+          </div>
+          <Comments />
         </div>
       </div>
     </div>
